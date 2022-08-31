@@ -15,6 +15,8 @@ public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private int quantity;
+
     private String name;
 }
