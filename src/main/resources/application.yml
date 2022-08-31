@@ -1,0 +1,17 @@
+database:
+  port: 5432
+  host: localhost
+  name: order_service
+spring:
+  datasource:
+    url: jdbc:postgresql://${database.host}:${database.port}/${database.name}
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL94Dialect
+        format_sql: true
+    show-sql: false
