@@ -16,10 +16,10 @@ public class JsonToMapConverter implements AttributeConverter<Map<String, Object
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(Map<String, Object> attribute) {
+    public String convertToDatabaseColumn(Map<String, Object> payload) {
         String payloadJson = null;
         try {
-            payloadJson = objectMapper.writeValueAsString(attribute);
+            payloadJson = objectMapper.writeValueAsString(payload);
         } catch (final JsonProcessingException e) {
             log.error(JSON_WRITING_ERROR, e);
         }
@@ -28,10 +28,10 @@ public class JsonToMapConverter implements AttributeConverter<Map<String, Object
     }
 
     @Override
-    public Map<String, Object> convertToEntityAttribute(String dbData) {
+    public Map<String, Object> convertToEntityAttribute(String payloadJSON) {
         Map<String, Object> payload = null;
         try {
-            payload = objectMapper.readValue(dbData, Map.class);
+            payload = objectMapper.readValue(payloadJSON, Map.class);
         } catch (IOException e) {
             log.error(JSON_READING_ERROR, e);
         }

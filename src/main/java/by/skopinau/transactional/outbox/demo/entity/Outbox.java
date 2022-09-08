@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -25,11 +24,8 @@ public class Outbox {
     @Column(name = "event_id")
     private int eventId;
 
-    @Column(name = "payload")
-    private String payloadJSON;
-
-    @Transient
     @Convert(converter = JsonToMapConverter.class)
+    @SuppressWarnings("JpaAttributeTypeInspection")
     private Map<String, Object> payload;
 
     @Column(name = "created_at")
