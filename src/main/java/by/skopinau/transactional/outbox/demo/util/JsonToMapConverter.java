@@ -11,6 +11,8 @@ import java.util.Map;
 @Slf4j
 public class JsonToMapConverter implements AttributeConverter<Map<String, Object>, String> {
 
+    private static final String JSON_WRITING_ERROR = "JSON writing error";
+    private static final String JSON_READING_ERROR = "JSON reading error";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -19,7 +21,7 @@ public class JsonToMapConverter implements AttributeConverter<Map<String, Object
         try {
             payloadJson = objectMapper.writeValueAsString(attribute);
         } catch (final JsonProcessingException e) {
-            log.error("JSON writing error", e);
+            log.error(JSON_WRITING_ERROR, e);
         }
 
         return payloadJson;
@@ -31,7 +33,7 @@ public class JsonToMapConverter implements AttributeConverter<Map<String, Object
         try {
             payload = objectMapper.readValue(dbData, Map.class);
         } catch (IOException e) {
-            log.error("JSON reading error", e);
+            log.error(JSON_READING_ERROR, e);
         }
 
         return payload;
