@@ -1,7 +1,7 @@
 package by.skopinau.transactional.outbox.demo.web;
 
 import by.skopinau.transactional.outbox.demo.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,9 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/orders")
+@RequiredArgsConstructor
 public class OrdersController {
-    @Autowired
-    private OrderService orderService;
+
+    private final OrderService orderService;
 
     @PostMapping
     public Map<String, Object> createOrder(@RequestBody Map<String, Object> order) {

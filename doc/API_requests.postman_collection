@@ -1,0 +1,67 @@
+{
+	"info": {
+		"_postman_id": "5afbec68-f69b-4dba-9e79-578d02e2285c",
+		"name": "transactional-outbox-demo-requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18857418"
+	},
+	"item": [
+		{
+			"name": "Order Creation Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Americano Coffe\",\r\n    \"quantity\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debezium Connector Activation Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"pg-connector\",\r\n  \"config\": {\r\n    \"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\",\r\n    \"plugin.name\": \"pgoutput\",\r\n    \"database.hostname\": \"host.docker.internal\",\r\n    \"database.port\": \"5432\",\r\n    \"database.user\": \"root\",\r\n    \"database.password\": \"root\",\r\n    \"database.server.id\": \"100\",\r\n    \"database.server.name\": \"orders_server\",\r\n    \"database.dbname\" : \"order_service\",\r\n    \"table.include.list\":\"public.outbox\",\r\n    \"database.history.kafka.bootstrap.servers\": \"kafka:9092\",\r\n    \"transforms\": \"unwrap\",\r\n    \"transforms.unwrap.type\": \"io.debezium.transforms.ExtractNewRecordState\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/connectors",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"connectors"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
