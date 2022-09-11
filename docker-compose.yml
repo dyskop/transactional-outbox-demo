@@ -1,28 +1,62 @@
 version: '3'
 services:
-  app-service:
-    container_name: app-container
+  order-service:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - database-service
+      - postgres
+      - kafka
+      - connect
     environment:
-      spring.datasource.url: jdbc:postgresql://database-service:5432/order_service
+      spring.datasource.url: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
     ports:
       - ${APP_PORT}:8080
-    restart: always
-  database-service:
-    container_name: postgresql-container
-    image: postgres:alpine
+
+  postgres:
+    image: quay.io/debezium/postgres:11
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: order_service
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - ${POSTRESQL_PORT}:5432
-    restart: always
-    volumes:
-      - db-data:/var/lib/postgresql/data
-volumes:
-  db-data:
+      - ${POSTGRES_PORT}:5432
+
+  zookeeper:
+    image: quay.io/debezium/zookeeper:1.9
+    ports:
+      - ${ZOOKEEPER_PORT_1}:2181
+      - ${ZOOKEEPER_PORT_2}:2888
+      - ${ZOOKEEPER_PORT_3}:3888
+
+  kafka:
+    image: quay.io/debezium/kafka:1.9
+    links:
+      - zookeeper
+    environment:
+      ZOOKEEPER_CONNECT: zookeeper:2181
+    ports:
+      - ${KAFKA_PORT}:9092
+
+  connect:
+    image: quay.io/debezium/connect:1.9
+    links:
+      - kafka
+      - postgres
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+    ports:
+      - ${CONNECT_PORT}:8083
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9092
+    ports:
+      - ${KAFDROP_PORT}:9000
