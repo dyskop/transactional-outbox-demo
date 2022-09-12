@@ -34,7 +34,9 @@ services:
     links:
       - zookeeper
     environment:
+      KAFKA_BROKER_ID: 1
       ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - ${KAFKA_PORT}:9092
 
