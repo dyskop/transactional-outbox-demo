@@ -14,7 +14,7 @@ services:
       - ${APP_PORT}:8080
 
   postgres:
-    image: quay.io/debezium/postgres:11
+    image: debezium/postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -23,31 +23,31 @@ services:
       - ${POSTGRES_PORT}:5432
 
   zookeeper:
-    image: quay.io/debezium/zookeeper:1.9
+    image: debezium/zookeeper
     ports:
       - ${ZOOKEEPER_PORT_1}:2181
       - ${ZOOKEEPER_PORT_2}:2888
       - ${ZOOKEEPER_PORT_3}:3888
 
   kafka:
-    image: quay.io/debezium/kafka:1.9
+    image: debezium/kafka
     links:
       - zookeeper
     environment:
-      KAFKA_BROKER_ID: 1
+      BROKER_ID: 1
       ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - ${KAFKA_PORT}:9092
 
   connect:
-    image: quay.io/debezium/connect:1.9
+    image: debezium/connect
     links:
       - kafka
+      - zookeeper
       - postgres
     environment:
-      BOOTSTRAP_SERVERS: kafka:9092
       GROUP_ID: 1
+      BOOTSTRAP_SERVERS: kafka:9092
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
       STATUS_STORAGE_TOPIC: my_connect_statuses
