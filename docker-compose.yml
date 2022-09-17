@@ -1,6 +1,7 @@
-version: '3'
+version: '3.9'
 services:
   order-service:
+    container_name: order-service
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,8 +13,11 @@ services:
       spring.datasource.url: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
     ports:
       - ${APP_PORT}:8080
+    networks:
+      - backend
 
   postgres:
+    container_name: postgres
     image: debezium/postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -21,30 +25,33 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - ${POSTGRES_PORT}:5432
+    networks:
+      - backend
 
   zookeeper:
+    container_name: zookeeper
     image: debezium/zookeeper
     ports:
       - ${ZOOKEEPER_PORT_1}:2181
       - ${ZOOKEEPER_PORT_2}:2888
       - ${ZOOKEEPER_PORT_3}:3888
+    networks:
+      - backend
 
   kafka:
+    container_name: kafka
     image: debezium/kafka
-    links:
-      - zookeeper
     environment:
       BROKER_ID: 1
       ZOOKEEPER_CONNECT: zookeeper:2181
     ports:
       - ${KAFKA_PORT}:9092
+    networks:
+      - backend
 
   connect:
+    container_name: connect
     image: debezium/connect
-    links:
-      - kafka
-      - zookeeper
-      - postgres
     environment:
       GROUP_ID: 1
       BOOTSTRAP_SERVERS: kafka:9092
@@ -53,8 +60,11 @@ services:
       STATUS_STORAGE_TOPIC: my_connect_statuses
     ports:
       - ${CONNECT_PORT}:8083
+    networks:
+      - backend
 
   kafdrop:
+    container_name: kafdrop
     image: obsidiandynamics/kafdrop
     depends_on:
       - kafka
@@ -62,3 +72,9 @@ services:
       KAFKA_BROKERCONNECT: kafka:9092
     ports:
       - ${KAFDROP_PORT}:9000
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: kafka-network
